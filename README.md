@@ -1,98 +1,215 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 💳 Plateforme de Paiement Backend - NestJS PoC
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend **NestJS** pour une plateforme de paiement avec authentification JWT, gestion multi-alias de paiement (bancaire/mobile money) et traitement de transactions sécurisé.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 📋 Fonctionnalités Principales
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- 🔐 **Authentification JWT** - Connexion par email ou téléphone
+- 👥 **Gestion Utilisateurs** - Inscription/profil sécurisé
+- 🏷️ **Alias de Paiement** - Multiples identités (BANK/MOBILE_MONEY) par utilisateur
+- 💰 **Paiements** - Initiation, suivi (PENDING/COMPLETED/CANCELLED), historique
+- 🛡️ **Sécurité** - Validation propriété, contraintes uniques, gestion erreurs
 
-## Project setup
+---
 
-```bash
-$ npm install
+## 🏗️ Stack & Architecture
+
+| Composant | Détails |
+|-----------|---------|
+| **Framework** | NestJS 11.0 + TypeScript |
+| **Base de Données** | SQLite + Prisma ORM |
+| **Auth** | JWT + Passport.js |
+| **Validation** | class-validator, class-transformer |
+| **Tests** | Jest + Supertest |
+
+### Structure
+
+```
+src/
+├── auth/           # JWT, login/register
+├── user/           # Gestion utilisateurs (CRUD)
+├── alias/          # Alias de paiement (BANK/MOBILE_MONEY)
+├── paiement/       # Traitement paiements, historique
+├── prisma/         # Service ORM
+└── main.ts         # Entry point
 ```
 
-## Compile and run the project
+### Modèle de Données
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+User (id, email, phoneNumber, password, timestamps)
+  ├── Alias[] (aliasCode, accountType, paymentIdentifier)
+  │   ├── sentPayments[] (Payment)
+  │   └── receivedPayments[] (Payment)
+  
+Payment (id, amount, status, senderAliasId, receiverAliasId, timestamps)
 ```
 
-## Run tests
+---
 
+## 🚀 Installation & Démarrage
+
+### Installation
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git clone https://github.com/RAYANEBIO/Proof_Of_Concept.git
+cd Proof_Of_Concept
+npm install
+cp .env.exemple .env
+npx prisma generate
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### Variables d'Environnement (.env)
+```env
+DATABASE_URL="file:./dev.db"
+JWT_SECRET=MaCleSecreteSuperSecureEtTresLongue123!
+PORT=3000
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Exécution
+```bash
+npm run start:dev      # Mode développement (watch)
+npm run start:prod     # Mode production
+npm run test           # Tests unitaires
+npm run test:e2e       # Tests end-to-end
+```
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## 📡 API Endpoints
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Authentification
+```
+POST   /auth/register    { name, email, phoneNumber, password }
+POST   /auth/login       { identifier, password } → { access_token, user }
+```
 
-## Support
+### Utilisateurs (JWT requis)
+```
+POST   /user            # Créer
+GET    /user            # Lister
+GET    /user/:id        # Détail
+PATCH  /user/:id        # Modifier
+DELETE /user/:id        # Supprimer
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Alias de Paiement (JWT requis)
+```
+POST   /alias           { name, accountType, paymentIdentifier }
+GET    /alias           # Lister alias utilisateur
+GET    /alias/:id       # Détail
+PATCH  /alias/:id       # Modifier
+DELETE /alias/:id       # Supprimer
+```
 
-## Stay in touch
+### Paiements (JWT requis)
+```
+POST   /paiement        { senderAliasCode, receiverAliasCode, amount }
+GET    /paiement/historique              # Tous les paiements
+GET    /paiement/historique?status=COMPLETED  # Filtrés
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## 🔄 Exemple Flux Paiement
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+# 1. Enregistrement
+POST /auth/register
+{ "name": "Alice", "email": "alice@ex.com", "phoneNumber": "+33612345678", "password": "Pass123!" }
+
+# 2. Connexion
+POST /auth/login
+{ "identifier": "alice@ex.com", "password": "Pass123!" }
+→ { "access_token": "JWT_TOKEN", "user": {...} }
+
+# 3. Créer alias bancaire
+POST /alias
+{ "name": "Compte Bancaire", "accountType": "BANK", "paymentIdentifier": "FR14..." }
+
+# 4. Créer alias mobile money
+POST /alias
+{ "name": "Orange Money", "accountType": "MOBILE_MONEY", "paymentIdentifier": "+33612345678" }
+
+# 5. Initier paiement
+POST /paiement
+{ "senderAliasCode": "code1", "receiverAliasCode": "code2", "amount": 50 }
+→ { "id": 1, "status": "COMPLETED", "amount": 50, ... }
+
+# 6. Consulter historique
+GET /paiement/historique
+```
+
+---
+
+## 🛡️ Sécurité
+
+✅ **Implémenté**
+- JWT sans état
+- Validation propriété (utilisateurs n'accèdent qu'à leurs données)
+- Validation entrées (class-validator)
+- Contraintes uniques BD
+- Suppression en cascade
+- Gestion erreurs (pas de fuite infos sensibles)
+
+⚠️ **À Implémenter (Production)**
+- Hachage mot de passe (bcrypt/argon2)
+- Limitation de débit (rate limiting)
+- HTTPS/CORS
+- Tokens d'actualisation
+- Journalisation audit
+
+---
+
+## 📦 Dépendances Clés
+
+```json
+{
+  "@nestjs/core": "^11.0.1",
+  "@nestjs/jwt": "^11.0.2",
+  "@nestjs/passport": "^11.0.5",
+  "@prisma/client": "^7.8.0",
+  "passport-jwt": "^4.0.1",
+  "class-validator": "^0.15.1",
+  "typescript": "^5.7.3",
+  "jest": "^30.0.0"
+}
+```
+
+---
+
+## 🐛 Limitations (PoC)
+
+1. Mots de passe en texte brut → Utiliser bcrypt
+2. Expiration jetons non configurée → Ajouter `expiresIn`
+3. SQLite → Utiliser PostgreSQL en production
+4. Simulation paiement moquée (90% succès) → APIs réelles
+5. Service utilisateurs en placeholder
+
+---
+
+## 🎯 Prochaines Étapes
+
+- [ ] Hachage mot de passe (bcrypt)
+- [ ] Documentation Swagger/OpenAPI
+- [ ] Amélioration simulation paiements
+- [ ] Logs structurés (Winston/Pino)
+- [ ] Couverture tests 80%+
+- [ ] Déploiement cloud (Heroku/AWS)
+
+---
+
+## 📚 Ressources
+
+- [NestJS Docs](https://docs.nestjs.com)
+- [JWT Authentication](https://docs.nestjs.com/security/authentication)
+- [Prisma ORM](https://www.prisma.io/docs)
+
+---
+
+## 👤 Auteur
+
+**RAYANEBIO** - [GitHub](https://github.com/RAYANEBIO)
+
+**Licence** : UNLICENSED (Projet privé)
