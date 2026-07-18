@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum AccountType {
+  BANK
+  MOBILE_MONEY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  phoneNumber  String   @unique
+  password     String
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  aliases       Alias[]
+}
+
+model Alias {
+  id                 Int         @id @default(autoincrement())
+  aliasCode          String      @unique
+  name               String
+  accountType        AccountType
+  paymentIdentifier  String
+
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  userId             Int
+  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sentPayments       Payment[]   @relation("SenderAlias")
+  receivedPayments   Payment[]   @relation("ReceiverAlias")
+
+  @@unique([userId, paymentIdentifier])
+}
+
+model Payment {
+  id               Int            @id @default(autoincrement())
+
+  senderAliasId    Int
+  receiverAliasId  Int
+
+  amount           Float
+  status           PaymentStatus  @default(PENDING)
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  senderAlias      Alias          @relation("SenderAlias", fields: [senderAliasId], references: [id])
+
+  receiverAlias    Alias          @relation("ReceiverAlias", fields: [receiverAliasId], references: [id])
+}
